@@ -1,0 +1,9 @@
+[S_poc]
+[A]
+S_poc:
+br_stanja: 9
+pocetno_stanje: 0
+prihvatljiva_stanja: {2=[A], 6=[-; NOVI_REDAK]}
+prijelazi: {3={a->[4]}, 7={
+->[8]}}
+epsilon_prijelazi: {0=[1,5], 1=[3], 4=[2], 5=[7], 8=[6]}
