@@ -1,0 +1,114 @@
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
+
+public class SA {
+    static class Cvor {
+        String value;
+        List<Cvor> children;
+
+        public Cvor(String value) {
+            this.value = value;
+            this.children = new LinkedList<>();
+        }
+
+        public Cvor(String value, List<Cvor> children) {
+            this.value = value;
+            this.children = children;
+        }
+
+        public void addChild(Cvor child) {
+            children.add(child);
+        }
+
+        public void addChildren(List<Cvor> children) {
+            this.children.addAll(children);
+        }
+
+        public void print() {
+            print(0);
+        }
+
+        private void print(int level) {
+            for (int i = 0; i < level; i++) System.out.print(" ");
+            System.out.println(value);
+            if (children == null) return;
+            for (Cvor child : children) {
+                child.print(level + 1);
+            }
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
+    record StackElement(int stanje, Cvor cvor) {}
+
+    static Tablica<Integer,String,String> akcije = new Tablica<>(new LinkedHashMap<>());
+    static Tablica<Integer,String,Integer> novoStanje = new Tablica<>(new LinkedHashMap<>());
+
+    public static void main(String[] args) {
+        tabliceInit();
+
+        // simuliraj
+        List<StackElement> stog = new LinkedList<>();
+        stog.add(new StackElement(0, new Cvor("<%>")));
+        boolean citajNoviZnak = true;
+        String line = null;
+        String znak = null;
+        String brojRetkaString;
+        int brojRetka;
+        String jedinka = null;
+
+        // citaj ulaz
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            if (citajNoviZnak) {
+                if (scanner.hasNextLine()) {
+                    line = scanner.nextLine();
+                } else {
+                    line = "# EOF $";
+                }
+                znak = line.split(" ")[0];
+                brojRetkaString = line.split(" ")[1];
+                jedinka = line.substring(znak.length() + brojRetkaString.length() + 2);
+            }
+
+            String akcija = akcije.get(stog.get(0).stanje, znak);
+            if (akcija == null) {
+                System.out.println("Greska na liniji: " + line);
+                return;
+            }
+            if (akcija.startsWith("pomakni")) {
+                int novoStanjeInt = Integer.parseInt(akcija.split("\\(")[1].split("\\)")[0]);
+                stog.add(0, new StackElement(novoStanjeInt, new Cvor(line, null)));
+                citajNoviZnak = true;
+            } else if (akcija.startsWith("reduciraj")) {
+                String produkcija = akcija.split("\\(")[1].split("\\)")[0];
+                String lijevaStrana = produkcija.split(" -> ")[0];
+                String desnaStrana = produkcija.split(" -> ")[1];
+                int brojZnakova = desnaStrana.split(" ").length;
+                List<Cvor> djeca = new LinkedList<>();
+                if (brojZnakova == 1 && desnaStrana.equals("$")) {
+                    djeca.add(new Cvor("$"));
+                } else {
+                    for (int i = 0; i < brojZnakova; i++) {
+                        djeca.add(0, stog.get(0).cvor);
+                        stog.remove(0);
+                    }
+                }
+                int novoStanjeInt = novoStanje.get(stog.get(0).stanje, lijevaStrana);
+                stog.add(0, new StackElement(novoStanjeInt, new Cvor(lijevaStrana, djeca)));
+                citajNoviZnak = false;
+            } else if (akcija.startsWith("prihvati")) {
+                // System.out.println("Prihvaceno!");
+                stog.get(0).cvor.print();
+                return;
+            } else {
+                System.out.println("Odbijeno na liniji: " + line);
+                return;
+            }
+        }
+    }
