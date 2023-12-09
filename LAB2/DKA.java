@@ -3,35 +3,55 @@ import java.util.*;
 public class DKA {
     private final List<String> zavrsniZnakovi;
     private final List<String> nezavrsniZnakovi;
-    private final Map<String, List<List<String>>> produkcije;
     private final Map<List<String>, List<String>> produkcijeInverzno;
     private final Tablica<Stanje,String,Stanje> prijelazi;
-    private final Stanje pocetnoStanje;
     private final Tablica<Integer,String,String> akcije = new Tablica<>(new LinkedHashMap<>());
     private final Tablica<Integer,String,Integer> novoStanje = new Tablica<>(new LinkedHashMap<>());
 
-    record Stanje(Set<Stavka> stavke, int n) {
+    static final class Stanje {
+        private final Set<Stavka> stavke;
+        private final int n;
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+        Stanje(Set<Stavka> stavke, int n) {
+            this.stavke = stavke;
+            this.n = n;
+        }
 
-            Stanje stanje = (Stanje) o;
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
 
-            return stavke.equals(stanje.stavke);
+                Stanje stanje = (Stanje) o;
+
+                return stavke.equals(stanje.stavke);
+            }
+
+            @Override
+            public int hashCode() {
+                return stavke.hashCode();
+            }
+
+        public Set<Stavka> stavke() {
+            return stavke;
+        }
+
+        public int n() {
+            return n;
         }
 
         @Override
-        public int hashCode() {
-            return stavke.hashCode();
+        public String toString() {
+            return "Stanje[" +
+                    "stavke=" + stavke + ", " +
+                    "n=" + n + ']';
         }
+
     }
 
     public DKA(ENKA enka, Map<List<String>, List<String>> produkcijeInverzno) {
         this.zavrsniZnakovi = enka.getZavrsniZnakovi();
         this.nezavrsniZnakovi = enka.getNezavrsniZnakovi();
-        this.produkcije = enka.getProdukcije();
         this.produkcijeInverzno = produkcijeInverzno;
 
         Map<Stanje,Map<String,Stanje>> prijelazi = new LinkedHashMap<>();
@@ -41,8 +61,6 @@ public class DKA {
         pocetneStavke = izracunajEpsOkruzenje(pocetneStavke, enka.getPrijelazi());
         Stanje pocetnoStanje = new Stanje(pocetneStavke, n++);
         prijelazi.put(pocetnoStanje, new LinkedHashMap<>());
-
-        this.pocetnoStanje = pocetnoStanje;
 
         List<Stanje> red = new LinkedList<>();
         red.add(pocetnoStanje);
@@ -79,14 +97,6 @@ public class DKA {
                 red.add(novoStanje);
                 n++;
             }
-            /* debug */
-            /*for (Stanje s : prijelazi.keySet()) {
-                for (String z : prijelazi.get(s).keySet()) {
-                    if (prijelazi.get(s).get(z) == null) continue;
-                    System.out.println(s.n + " + " + z + " -> " + prijelazi.get(s).get(z).n);
-                }
-            }
-            System.out.println();*/
         }
 
         this.prijelazi = new Tablica<>(prijelazi);
@@ -137,8 +147,9 @@ public class DKA {
                                     break;
                                 }
                             }
+                        } else {
+                            akcije.set(stanje.n, znak, "reduciraj(" + stavka.ispisiSamoProdukciju() + ")");
                         }
-                        akcije.set(stanje.n, znak, "reduciraj(" + stavka.ispisiSamoProdukciju() + ")");
                     }
                 }
             }

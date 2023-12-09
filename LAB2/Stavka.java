@@ -85,10 +85,10 @@ public class Stavka {
         StringBuilder sb = new StringBuilder();
         sb.append(lijevaStrana).append(" -> ");
         for (int i = 0; i < desnaStrana.size(); i++) {
-            if (i == tocka) sb.append("•");
+            if (i == tocka) sb.append("*");
             sb.append(desnaStrana.get(i)).append(" ");
         }
-        if (tocka == desnaStrana.size()) sb.append("•");
+        if (tocka == desnaStrana.size()) sb.append("*");
         sb.append(" { ");
         for (String znak : skupSlijedi) {
             sb.append(znak).append(" ");

@@ -1,6 +1,4 @@
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -110,22 +108,29 @@ public class GSA {
         } catch (Exception e) {
             throw new RuntimeException("Error reading SA.txt");
         }
-        // add tablicaInit to SA.java
-        lines.add("\n\tstatic void tabliceInit() {");
-        lines.add("\t\t// akcije");
-        for (Integer stanje : akcije.getKeys()) {
-            for (String znak : akcije.getKeys(stanje)) {
-                lines.add("\t\takcije.set(" + stanje + ", \"" + znak + "\", \"" + akcije.get(stanje, znak) + "\");");
-            }
+
+        writeToFile(lines, file);
+
+        // write to tablice.txt
+        lines = new LinkedList<>();
+        file = new File("analizator/tablice.txt");
+
+        PrintStream stdout = System.out;
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outputStream));
+
+        dka.ispisiTablice();
+
+        System.setOut(stdout);
+
+        Scanner newScanner = new Scanner(outputStream.toString());
+        while (newScanner.hasNextLine()) {
+            lines.add(newScanner.nextLine());
         }
-        lines.add("\t\t// novoStanje");
-        for (Integer stanje : novoStanje.getKeys()) {
-            for (String znak : novoStanje.getKeys(stanje)) {
-                lines.add("\t\tnovoStanje.set(" + stanje + ", \"" + znak + "\", " + novoStanje.get(stanje, znak) + ");");
-            }
-        }
-        lines.add("\t}");
-        lines.add("}");
+
+        // add sinkronizacijski znakovi
+        lines.add("\nSinkronizacijski znakovi:");
+        lines.addAll(sinkronizacijskiZnakovi);
 
         writeToFile(lines, file);
     }

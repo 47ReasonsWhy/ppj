@@ -1,7 +1,7 @@
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
+import java.io.File;
+import java.nio.file.Files;
+import java.util.*;
+
 
 public class SA {
     static class Cvor {
@@ -44,13 +44,75 @@ public class SA {
             return value;
         }
     }
-    record StackElement(int stanje, Cvor cvor) {}
 
+    static final class StackElement {
+        private final int stanje;
+        private final Cvor cvor;
+
+        StackElement(int stanje, Cvor cvor) {
+            this.stanje = stanje;
+            this.cvor = cvor;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (StackElement) obj;
+            return this.stanje == that.stanje &&
+                    Objects.equals(this.cvor, that.cvor);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(stanje, cvor);
+        }
+
+        @Override
+        public String toString() {
+            return "StackElement[" +
+                    "stanje=" + stanje + ", " +
+                    "cvor=" + cvor + ']';
+        }
+    }
+
+    static List<String> sinkronizacijskiZnakovi = new LinkedList<>();
     static Tablica<Integer,String,String> akcije = new Tablica<>(new LinkedHashMap<>());
     static Tablica<Integer,String,Integer> novoStanje = new Tablica<>(new LinkedHashMap<>());
 
     public static void main(String[] args) {
-        tabliceInit();
+        // read from tablice.txt
+        List<String> lines;
+        try {
+            lines = Files.readAllLines(new File("tablice.txt").toPath());
+        } catch (Exception e) {
+            throw new RuntimeException("Error reading tablice.txt");
+        }
+        lines = lines.subList(1, lines.size());
+        while (!lines.isEmpty() && !lines.get(0).isEmpty()) {
+            String stanje = lines.remove(0);
+            while (!lines.isEmpty() && lines.get(0).startsWith("  ")) {
+                String znakIAkcija = lines.remove(0);
+                String znak = znakIAkcija.split(" => ")[0].trim();
+                String akcija = znakIAkcija.split(" => ")[1].trim();
+                akcije.set(Integer.parseInt(stanje), znak, akcija);
+            }
+        }
+        lines = lines.subList(2, lines.size());
+        while (!lines.isEmpty() && !lines.get(0).isEmpty()) {
+            String stanje = lines.remove(0);
+            while (!lines.isEmpty() && lines.get(0).startsWith("  ")) {
+                String znakINovoStanje = lines.remove(0);
+                String znak = znakINovoStanje.split(" => ")[0].trim();
+                String novoStanjeString = znakINovoStanje.split(" => ")[1].trim();
+                novoStanje.set(Integer.parseInt(stanje), znak, Integer.parseInt(novoStanjeString));
+            }
+        }
+        lines = lines.subList(2, lines.size());
+        while (!lines.isEmpty() && !lines.get(0).isEmpty()) {
+            String znak = lines.remove(0);
+            sinkronizacijskiZnakovi.add(znak);
+        }
 
         // simuliraj
         List<StackElement> stog = new LinkedList<>();
@@ -58,19 +120,14 @@ public class SA {
         boolean citajNoviZnak = true;
         String line = null;
         String znak = null;
-        String brojRetkaString;
-        int brojRetka;
+        String brojRetkaString = null;
         String jedinka = null;
 
         // citaj ulaz
         Scanner scanner = new Scanner(System.in);
         while (true) {
             if (citajNoviZnak) {
-                if (scanner.hasNextLine()) {
-                    line = scanner.nextLine();
-                } else {
-                    line = "# EOF $";
-                }
+                line = scanner.hasNextLine() ? scanner.nextLine() : "# EOF $";
                 znak = line.split(" ")[0];
                 brojRetkaString = line.split(" ")[1];
                 jedinka = line.substring(znak.length() + brojRetkaString.length() + 2);
@@ -106,9 +163,39 @@ public class SA {
                 // System.out.println("Prihvaceno!");
                 stog.get(0).cvor.print();
                 return;
+            } else if (akcija.startsWith("odbaci")) {
+                // ispisi gresku
+                Set<String> prihvatljiviZnakovi = new TreeSet<>();
+                int stanje = stog.get(0).stanje;
+                for (String znak1 : akcije.get(stanje).keySet()) {
+                    if (!akcije.get(stanje, znak1).startsWith("odbaci")) {
+                        prihvatljiviZnakovi.add(znak1);
+                    }
+                }
+                System.err.println("Pogreska na retku " + brojRetkaString + ":");
+                System.err.println("Ocekivani znakovi: " + prihvatljiviZnakovi);
+                System.err.println("Procitan znak: " + znak);
+                System.err.println("Jedinka: " + jedinka + "\n");
+                // oporavak od greske
+                while (!sinkronizacijskiZnakovi.contains(znak)) {
+                    if (!scanner.hasNextLine()) {
+                        System.err.println("Nemoguc oporavak od pogreske – nema vise sinkronizacijskih znakova.\n");
+                        System.out.println("Odbijeno.");
+                        return;
+                    }
+                    line = scanner.nextLine();
+                    znak = line.split(" ")[0];
+                    brojRetkaString = line.split(" ")[1];
+                    jedinka = line.substring(znak.length() + brojRetkaString.length() + 2);
+                }
+                citajNoviZnak = false;
+                while (akcije.get(stog.get(0).stanje, znak).startsWith("odbaci")) {
+                    stog.remove(0);
+                }
             } else {
-                System.out.println("Odbijeno na liniji: " + line);
+                System.err.println("Nepoznata akcija: " + akcija);
                 return;
             }
         }
     }
+}
