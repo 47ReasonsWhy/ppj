@@ -1,0 +1,67 @@
+int x;
+	int _	-> DW 0
+
+int x = 42:
+	int _	-> DW 0
+	42	-> stavi 42 na stog
+	x =	-> uzmi jedan sa stoga i pohrani u D_X
+
+int x = y + z;
+	int _	-> DW 0
+	y, z	-> ucitaj y i stavi na stog, ucitaj z i stavi na stog
+	+	-> uzmi dva sa stoga, zbroji, stavi rezultat na stog
+	x =	-> uzmi jedan sa stoga i pohrani u D_X
+
+	return _ -> prebaci jedan sa stoga u R6
+
+
+MUL:
+R2 = drugi operand POP sa stoga
+R1 = prvi operand POP sa stoga
+R0 = 0xffffffff
+R6 = 0x80000000
+R3 = predznak R1 ? (1 ili 0)
+ako R3: pretvori R1 u pozitivni
+R4 = predznak R2 ? (1 ili 0)
+ako R4: pretvori R2 u pozitivni
+R6 = 0
+ako R1 == 0 ili R2 == 0: prekoci LOOP
+LOOP:
+	R6 += R2
+	R1 -= 1
+	ako R1 != 0: goto LOOP
+ako R3 != R4: negiraj R6
+
+
+DIV:
+R2 = drugi operand POP sa stoga
+R1 = prvi operand POP sa stoga
+R0 = 0xffffffff
+R6 = 0x80000000
+R3 = predznak R1 ? (1 ili 0)
+ako R3: pretvori R1 u pozitivni
+R4 = predznak R2 ? (1 ili 0)
+ako R4: pretvori R2 u pozitivni
+R6 = 0
+ako R1 < R2 ili R2 == 0: prekoci LOOP
+LOOP:
+	R6 += 1
+	R1 -= R2
+	ako R1 >= R2: goto LOOP
+ako R3 != R4: negiraj R6
+
+MOD:
+R2 = drugi operand POP sa stoga
+R1 = prvi operand POP sa stoga
+R0 = 0xffffffff
+R6 = 0x80000000
+R3 = predznak R1 ? (1 ili 0)
+ako R3: pretvori R1 u pozitivni
+R4 = predznak R2 ? (1 ili 0)
+ako R4: pretvori R2 u pozitivni
+ako R1 < R2 ili R2 == 0: prekoci LOOP
+LOOP:
+	R1 -= R2
+	ako R1 >= R2: goto LOOP
+ako R3 != R4: negiraj R1
+R6 = R1
