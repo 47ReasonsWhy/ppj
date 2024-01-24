@@ -58,12 +58,12 @@ public class JednakosniIzraz {
                 }
                 znak.deklaracija = new Deklaracija("int", false);
 
-                int index = List.of("OP_EQ, OP_NEQ").indexOf(znak.djeca.get(1).ime);
+                int index = List.of("OP_EQ", "OP_NEQ").indexOf(znak.djeca.get(1).ime);
                 strpajKod(znak, List.of(
                         "\t\t\tPOP\t\tR1",
                         "\t\t\tPOP\t\tR0",
                         "\t\t\tCMP\t\tR0, R1",
-                        "\t\t\tJP_" + List.of("EQ", "NE").get(index) + "\t\tL_" + String.format("%04X", Tablice.labelCounter),
+                        "\t\t\tJP_" + List.of("EQ", "NE").get(index) + "\tL_" + String.format("%04X", Tablice.labelCounter),
                         "\t\t\tMOVE\t%D 0, R0",
                         "\t\t\tJP\t\tL_" + String.format("%04X", Tablice.labelCounter) + "_END",
                         "L_" + String.format("%04X", Tablice.labelCounter) + "\t\tMOVE\t%D 1, R0",

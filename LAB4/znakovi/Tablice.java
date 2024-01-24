@@ -22,9 +22,9 @@ public class Tablice {
     public static Long varCounter;
     public static Long labelCounter;
 
-    public Boolean usingMUL;
-    public Boolean usingDIV;
-    public Boolean usingMOD;
+    public static Boolean usingMUL;
+    public static Boolean usingDIV;
+    public static Boolean usingMOD;
 
     public Tablice(Map<String, Deklaracija> tablicaDeklaracija,
                    Map<String, Integer> tablicaIndeksaVarijabli,

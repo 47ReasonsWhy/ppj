@@ -45,6 +45,15 @@ public class UnarniIzraz {
                             return false;
                         }
                         znak.deklaracija = new Deklaracija("int", false);
+
+                        strpajKod(znak, List.of(
+                                "\t\t\tPOP\t\tR0",
+                                "\t\t\tLOAD\tR1, (R0)",
+                                "\t\t\t" + (znak.djeca.get(0).ime.equals("OP_INC") ? "ADD" : "SUB") + "\t\tR1, 1, R1",
+                                "\t\t\tSTORE\tR1, (R0)",
+                                "\t\t\tPUSH\tR1"
+                        ));
+
                         break;
                     case "<cast_izraz>":
                         if (!znak.djeca.get(0).ime.equals("<unarni_operator>")) {

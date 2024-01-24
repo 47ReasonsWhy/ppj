@@ -1,6 +1,7 @@
 package izrazi;
 
 import znakovi.Deklaracija;
+import znakovi.Tablice;
 import znakovi.Znak;
 
 import java.util.List;
@@ -57,21 +58,30 @@ public class MultiplikativniIzraz {
                 }
                 znak.deklaracija = new Deklaracija("int", false);
 
-                // dodano za generator koda
-                strpajKod(znak, List.of(
-                        "\t\t\tCALL\t" + znak.djeca.get(1).ime,
-                        "\t\t\tADD\t\tR7, 8, R7",
-                        "\t\t\tPUSH\t\tR6"
-                ));
                 switch (znak.djeca.get(1).ime) {
                     case "OP_PUTA":
-                        znak.tablice.usingMUL = true;
+                        strpajKod(znak, List.of(
+                                "\t\t\tCALL\tMUL",
+                                "\t\t\tADD\t\tR7, 8, R7",
+                                "\t\t\tPUSH\tR6"
+                        ));
+                        Tablice.usingMUL = true;
                         break;
                     case "OP_DIJELI":
-                        znak.tablice.usingDIV = true;
+                        strpajKod(znak, List.of(
+                                "\t\t\tCALL\tDIV",
+                                "\t\t\tADD\t\tR7, 8, R7",
+                                "\t\t\tPUSH\tR6"
+                        ));
+                        Tablice.usingDIV = true;
                         break;
                     case "OP_MOD":
-                        znak.tablice.usingMOD = true;
+                        strpajKod(znak, List.of(
+                                "\t\t\tCALL\tMOD",
+                                "\t\t\tADD\t\tR7, 8, R7",
+                                "\t\t\tPUSH\tR6"
+                        ));
+                        Tablice.usingMOD = true;
                         break;
                 }
 

@@ -83,7 +83,7 @@ public class DeklaracijaParametra {
             for (String var : znak.tablice.stackOffset.keySet()) {
                 znak.tablice.stackOffset.replace(var, znak.tablice.stackOffset.get(var) + 4);
             }
-            znak.tablice.stackOffset.put(idn.jedinka, 4);
+            znak.tablice.stackOffset.put(idn.jedinka, 8);
         }
         return true;
     }

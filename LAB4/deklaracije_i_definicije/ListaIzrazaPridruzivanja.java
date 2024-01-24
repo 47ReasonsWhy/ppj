@@ -3,6 +3,10 @@ package deklaracije_i_definicije;
 import izrazi.IzrazPridruzivanja;
 import znakovi.Znak;
 
+import java.util.List;
+
+import static util.Util.strpajKod;
+
 public class ListaIzrazaPridruzivanja {
     public static boolean obradi(Znak znak) {
         if (!znak.ime.equals("<lista_izraza_pridruzivanja>")) {
@@ -48,6 +52,11 @@ public class ListaIzrazaPridruzivanja {
                 znak.br_elem = listaIzrazaPridruzivanja.br_elem + 1;
                 break;
         }
+
+        strpajKod(znak, List.of(
+                ""
+        ));
+
         return true;
     }
 }

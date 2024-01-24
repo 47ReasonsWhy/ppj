@@ -57,8 +57,8 @@ public class NaredbaSkoka {
                             ispisiGresku(znak);
                             return false;
                         }
-                        znak.tablice.generiraniKod.add("\t\t\tMOVE\tR7, R5");
-                        znak.tablice.generiraniKod.add("\t\t\tSUB\t\tR5, %D 4, R5");
+                        znak.tablice.generiraniKod.add("\t\t\tMOVE\tR5, R7");
+                        znak.tablice.generiraniKod.add("\t\t\tPOP\t\tR5");
                         znak.tablice.generiraniKod.add("\t\t\tRET");
                         break;
                     default:
@@ -99,8 +99,8 @@ public class NaredbaSkoka {
                 }
 
                 znak.tablice.generiraniKod.add("\t\t\tPOP\t\tR6");
-                znak.tablice.generiraniKod.add("\t\t\tMOVE\tR7, R5");
-                znak.tablice.generiraniKod.add("\t\t\tSUB\t\tR5, %D 4, R5");
+                znak.tablice.generiraniKod.add("\t\t\tMOVE\tR5, R7");
+                znak.tablice.generiraniKod.add("\t\t\tPOP\t\tR5");
                 znak.tablice.generiraniKod.add("\t\t\tRET");
                 break;
             default:

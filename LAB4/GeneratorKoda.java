@@ -129,13 +129,13 @@ public class GeneratorKoda {
             System.out.println(s);
         }
 
-        if (korijen.tablice.usingMUL) {
+        if (Tablice.usingMUL) {
             mul.forEach(System.out::println);
         }
-        if (korijen.tablice.usingDIV) {
+        if (Tablice.usingDIV) {
             div.forEach(System.out::println);
         }
-        if (korijen.tablice.usingMOD) {
+        if (Tablice.usingMOD) {
             mod.forEach(System.out::println);
         }
     }
@@ -163,6 +163,7 @@ public class GeneratorKoda {
     }
 
     private final static List<String> mul = List.of(
+            "",
             "MUL\t\t\tADD\t\tR7, %D 4, R7",
             "\t\t\tPOP\t\tR2",
             "\t\t\tPOP\t\tR1",
@@ -201,6 +202,7 @@ public class GeneratorKoda {
     );
 
     private final static List<String> div = List.of(
+            "",
             "DIV\t\t\tADD\t\tR7, %D 4, R7",
             "\t\t\tPOP\t\tR2",
             "\t\t\tPOP\t\tR1",
@@ -240,6 +242,7 @@ public class GeneratorKoda {
     );
 
     private final static List<String> mod = List.of(
+            "",
             "MOD\t\t\tADD\t\tR7, %D 4, R7",
             "\t\t\tPOP\t\tR2",
             "\t\t\tPOP\t\tR1",

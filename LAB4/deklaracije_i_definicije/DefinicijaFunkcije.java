@@ -9,6 +9,7 @@ import znakovi.Znak;
 import java.util.List;
 
 import static util.Util.ispisiGresku;
+import static util.Util.strpajKod;
 
 public class DefinicijaFunkcije {
     public static boolean obradi(Znak znak) {
@@ -30,7 +31,10 @@ public class DefinicijaFunkcije {
             System.err.println("Neispravno ime djeteta cvora <definicija_funkcije>: " + idn.ime+ " umjesto IDN");
             System.exit(1);
         }
-        znak.tablice.generiraniKod.add("\nF_" + idn.jedinka.toUpperCase() + " ".repeat(10 - idn.jedinka.length()) + "MOVE\tR7, R5");
+        znak.tablice.generiraniKod.addAll(List.of(
+                "\nF_" + idn.jedinka.toUpperCase() + " ".repeat(10 - idn.jedinka.length()) + "PUSH\tR5",
+                "\t\t\tMOVE\tR7, R5"
+        ));
         if (!znak.djeca.get(2).ime.equals("L_ZAGRADA")) {
             System.err.println("Neispravno ime djeteta cvora <definicija_funkcije>: " + znak.djeca.get(2).ime + " umjesto L_ZAGRADA");
             System.exit(1);
@@ -108,6 +112,15 @@ public class DefinicijaFunkcije {
                 System.exit(1);
         }
         znak.tablice.stackOffset.clear();
+
+        if (!znak.tablice.generiraniKod.get(znak.tablice.generiraniKod.size() - 1).equals("\t\t\tRET")) {
+            strpajKod(znak, List.of(
+                "\t\t\tMOVE\tR5, R7",
+                "\t\t\tPOP\t\tR5",
+                "\t\t\tRET"
+            ));
+        }
+
         return true;
     }
 }

@@ -49,6 +49,14 @@ public class LogIliIzraz {
                     ispisiGresku(znak);
                     return false;
                 }
+
+                long labelCounter = Tablice.labelCounter++;
+                strpajKod(znak, List.of(
+                        "\t\t\tPOP\t\tR0",
+                        "\t\t\tCMP\t\tR0, %D 0",
+                        "\t\t\tJP_NE\tL1_" + String.format("%04X", labelCounter)
+                ));
+
                 if (!LogIIzraz.obradi(logIIzraz1)) {
                     return false;
                 }
@@ -59,16 +67,13 @@ public class LogIliIzraz {
                 znak.deklaracija = new Deklaracija("int", false);
 
                 strpajKod(znak, List.of(
-                        "\t\t\tPOP\t\tR1",
                         "\t\t\tPOP\t\tR0",
                         "\t\t\tCMP\t\tR0, %D 0",
-                        "\t\t\tJP_NE\t" + "L_" + String.format("%04X", Tablice.labelCounter),
-                        "\t\t\tCMP\t\tR1, %D 0",
-                        "\t\t\tJP_NE\t" + "L_" + String.format("%04X", Tablice.labelCounter),
+                        "\t\t\tJP_NE\tL1_" + String.format("%04X", labelCounter),
                         "\t\t\tMOVE\t%D 0, R0",
-                        "\t\t\tJP\t\t" + "L_" + String.format("%04X", Tablice.labelCounter) + "_END",
-                        "L_" + String.format("%04X", Tablice.labelCounter) + "\t\tMOVE\t%D 1, R0",
-                        "L_" + String.format("%04X", Tablice.labelCounter++) + "_END\tPUSH\tR0"
+                        "\t\t\tJP\t\tL2_" + String.format("%04X", labelCounter),
+                        "L1_" + String.format("%04X", labelCounter) + "\t\tMOVE\t%D 1, R0",
+                        "L2_" + String.format("%04X", labelCounter) + "\t\tPUSH\tR0"
                 ));
 
                 break;

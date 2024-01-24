@@ -30,9 +30,13 @@ public class PrimarniIzraz {
 
                         if (deklaracija.tip.startsWith("funkcija")) {
                             strpajKod(znak, List.of(
-                                    "\t\t\tCALL\tF_" + dijete.jedinka.toUpperCase(),
-                                    "\t\t\tPUSH\tR6"
+                                    "\t\t\tCALL\tF_" + dijete.jedinka.toUpperCase()
                             ));
+                            if (!deklaracija.tip.endsWith(" -> void)")) {
+                                strpajKod(znak, List.of(
+                                        "\t\t\tPUSH\tR6"
+                                ));
+                            }
                         } else if (znak.tablice.stackOffset.get(dijete.jedinka) == null) {
                             Znak trenutni = znak;
                             int index;
@@ -45,10 +49,19 @@ public class PrimarniIzraz {
                                 return false;
                             }
                             index = trenutni.tablice.tablicaIndeksaVarijabli.get(dijete.jedinka);
-                            strpajKod(znak, List.of(
-                                    "\t\t\tLOAD\tR0, (G_" + String.format("%04X", index) + ")",
-                                    "\t\t\tPUSH\tR0"
-                            ));
+                            if (deklaracija.tip.startsWith("niz") ||
+                                List.of("<izraz_pridruzivanja>", "<postfiks_izraz>").contains(znak.roditelj.roditelj.ime) ||
+                                znak.roditelj.roditelj.roditelj.ime.equals("<unarni_izraz>")){
+                                strpajKod(znak, List.of(
+                                        "\t\t\tMOVE\tG_" + String.format("%04X", index) + ", R0",
+                                        "\t\t\tPUSH\tR0"
+                                ));
+                            } else {
+                                strpajKod(znak, List.of(
+                                        "\t\t\tLOAD\tR0, (G_" + String.format("%04X", index) + ")",
+                                        "\t\t\tPUSH\tR0"
+                                ));
+                            }
                         } else {
                             strpajKod(znak, List.of(
                                     "\t\t\tLOAD\tR0, (R5+" + String.format("%04X", znak.tablice.stackOffset.get(dijete.jedinka)) + ")",

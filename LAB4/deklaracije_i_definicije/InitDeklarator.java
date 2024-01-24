@@ -3,6 +3,7 @@ package deklaracije_i_definicije;
 import znakovi.Deklaracija;
 import znakovi.Znak;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import static util.Util.*;
@@ -53,6 +54,20 @@ public class InitDeklarator {
                     return false;
                 }
                 String t;
+
+                // find index of global variable
+                Znak trenutni = znak;
+                int index;
+                while (trenutni != null && trenutni.tablice.tablicaIndeksaVarijabli.get(izravniDeklarator2.jedinka) == null) {
+                    trenutni = trenutni.roditelj;
+                }
+                if (trenutni == null) {
+                    System.err.println("Nije pronadjen indeks varijable " + izravniDeklarator2.jedinka);
+                    System.exit(1);
+                    return false;
+                }
+                index = trenutni.tablice.tablicaIndeksaVarijabli.get(izravniDeklarator2.jedinka);
+
                 switch (izravniDeklarator2.deklaracija.tip) {
                     case "char":
                     case "int":
@@ -65,6 +80,12 @@ public class InitDeklarator {
                             ispisiGresku(znak);
                             return false;
                         }
+
+                        strpajKod(znak, List.of(
+                                "\t\t\tPOP\t\tR0",
+                                "\t\t\tSTORE\tR0, (G_" + String.format("%04X", index) + ")"
+                        ));
+
                         break;
                     case "niz(char)":
                     case "niz(int)":
@@ -91,27 +112,23 @@ public class InitDeklarator {
                                 return false;
                             }
                         }
+
+                        List<String> kodZaStrpat = new LinkedList<>(List.of(
+                                "\t\t\tMOVE\tG_" + String.format("%04X", index) + ", R1"
+                        ));
+                        int br_elem = inicijalizator.br_elem - 1;
+                        for (int i = br_elem; i >= 0; i--) {
+                            String hex = String.format("%02X", i*4);
+                            kodZaStrpat.add("\t\t\tPOP\t\tR0");
+                            kodZaStrpat.add("\t\t\tSTORE\tR0, (R1+" + hex + ")");
+                        }
+                        strpajKod(znak, kodZaStrpat);
+
                         break;
                     default:
                         ispisiGresku(znak);
                         return false;
                 }
-
-                Znak trenutni = znak;
-                int index;
-                while (trenutni != null && trenutni.tablice.tablicaIndeksaVarijabli.get(izravniDeklarator2.jedinka) == null) {
-                    trenutni = trenutni.roditelj;
-                }
-                if (trenutni == null) {
-                    System.err.println("Nije pronadjen indeks varijable " + izravniDeklarator2.jedinka);
-                    System.exit(1);
-                    return false;
-                }
-                index = trenutni.tablice.tablicaIndeksaVarijabli.get(izravniDeklarator2.jedinka);
-                strpajKod(znak, List.of(
-                        "\t\t\tPOP\t\tR0",
-                        "\t\t\tSTORE\tR0, (G_" + String.format("%04X", index) + ")"
-                ));
                 break;
             default:
                 System.err.println("Neispravan broj djece cvora <init_deklarator>: " + znak.djeca.size() + " umjesto 1 ili 3");

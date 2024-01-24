@@ -3,8 +3,9 @@ package izrazi;
 import znakovi.Deklaracija;
 import znakovi.Znak;
 
-import static util.Util.implicitnoKastabilan;
-import static util.Util.ispisiGresku;
+import java.util.List;
+
+import static util.Util.*;
 
 public class IzrazPridruzivanja {
     public static boolean obradi(Znak znak) {
@@ -55,6 +56,13 @@ public class IzrazPridruzivanja {
                     return false;
                 }
                 znak.deklaracija = new Deklaracija(postfiksIzraz.deklaracija.tip, false);
+
+                strpajKod(znak, List.of(
+                        "\t\t\tPOP\t\tR1",
+                        "\t\t\tPOP\t\tR0",
+                        "\t\t\tSTORE\tR1, (R0)"
+                ));
+
                 break;
             default:
                 System.err.println("Neispravan broj djece cvora <izraz_pridruzivanja>: " + znak.djeca.size() + " umjesto 1 ili 3");

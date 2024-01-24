@@ -45,6 +45,15 @@ public class PostfiksIzraz {
                     System.exit(1);
                 }
                 znak.deklaracija = new Deklaracija("int", false);
+
+                strpajKod(znak, List.of(
+                        "\t\t\tPOP\t\tR0",
+                        "\t\t\tLOAD\tR1, (R0)",
+                        "\t\t\tPUSH\tR1",
+                        "\t\t\t" + (znak.djeca.get(1).ime.equals("OP_INC") ? "ADD" : "SUB") + "\t\tR1, 1, R1",
+                        "\t\t\tSTORE\tR1, (R0)"
+                ));
+
                 break;
             case 3:
                 Znak postfiksIzraz2 = znak.djeca.get(0);
@@ -106,6 +115,29 @@ public class PostfiksIzraz {
                             return false;
                         }
                         znak.deklaracija = new Deklaracija(X, !X.startsWith("const("));
+
+                        boolean lijevaStrana = znak.roditelj.ime.equals("<izraz_pridruzivanja>") &&
+                                znak.roditelj.djeca.size() == 3 &&
+                                znak.roditelj.djeca.get(1).ime.equals("OP_PRIDRUZI");
+
+                        strpajKod(znak, List.of(
+                                "\t\t\tPOP\t\tR1",
+                                "\t\t\tPOP\t\tR0",
+                                "\t\t\tADD\t\tR0, R1, R0",
+                                "\t\t\tADD\t\tR0, R1, R0",
+                                "\t\t\tADD\t\tR0, R1, R0",
+                                "\t\t\tADD\t\tR0, R1, R0"
+                        ));
+                        if (lijevaStrana) {
+                            strpajKod(znak, List.of(
+                                    "\t\t\tPUSH\tR0"));
+                        } else {
+                            strpajKod(znak, List.of(
+                                    "\t\t\tLOAD\tR0, (R0)",
+                                    "\t\t\tPUSH\tR0"
+                            ));
+                        }
+
                         break;
                     case "L_ZAGRADA":
                         Znak postfiksIzraz4 = znak.djeca.get(0);
@@ -126,10 +158,18 @@ public class PostfiksIzraz {
                             return false;
                         }
 
-                        List<String> call = new ArrayList<>(List.of(
-                                znak.tablice.generiraniKod.remove(znak.tablice.generiraniKod.size() - 2),
-                                znak.tablice.generiraniKod.remove(znak.tablice.generiraniKod.size() - 1)
-                        ));
+                        List<String> call;
+                        if (postfiksIzraz4.deklaracija.tip.endsWith(" -> void)")) {
+                            call = new ArrayList<>(List.of(
+                                    znak.tablice.generiraniKod.remove(znak.tablice.generiraniKod.size() - 1)
+                            ));
+                        } else {
+                            call = new ArrayList<>(List.of(
+                                    znak.tablice.generiraniKod.remove(znak.tablice.generiraniKod.size() - 2),
+                                    znak.tablice.generiraniKod.remove(znak.tablice.generiraniKod.size() - 1)
+                            ));
+                        }
+
                         if (!ListaArgumenata.obradi(listaArgumenata)) {
                             return false;
                         }

@@ -2,6 +2,7 @@ package deklaracije_i_definicije;
 
 import izrazi.IzrazPridruzivanja;
 import znakovi.Deklaracija;
+import znakovi.Tablice;
 import znakovi.Znak;
 
 import java.util.LinkedList;
@@ -54,12 +55,15 @@ public class Inicijalizator {
                     System.err.println("Neispravno ime djeteta cvora <inicijalizator>: " + znak.djeca.get(2).ime + " umjesto D_VIT_ZAGRADA");
                     System.exit(1);
                 }
+
                 if (!ListaIzrazaPridruzivanja.obradi(listaIzrazaPridruzivanja)) {
                     return false;
                 }
+
                 znak.br_elem = listaIzrazaPridruzivanja.br_elem;
                 znak.deklaracija = new Deklaracija(listaIzrazaPridruzivanja.deklaracija.tip, false);
                 znak.jedinka = listaIzrazaPridruzivanja.jedinka;
+
                 break;
         }
         return true;

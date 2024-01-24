@@ -70,7 +70,10 @@ public class IzravniDeklarator {
                             return false;
                         }
                         znak.tablice.tablicaDeklaracija.put(idn.jedinka, znak.deklaracija);
-                        znak.tablice.tablicaIndeksaVarijabli.put(idn.jedinka, (Tablice.varCounter++).intValue());
+                        znak.tablice.tablicaIndeksaVarijabli.put(idn.jedinka, (Tablice.varCounter).intValue());
+
+                        znak.tablice.kodGlobalnihDeklaracija.add("G_" + String.format("%04X", (Tablice.varCounter++).intValue())  + "\t\t`DS\t\t" + znak.br_elem);
+
                         break;
                     case "KR_VOID":
                         if (!znak.djeca.get(1).ime.equals("L_ZAGRADA")) {
